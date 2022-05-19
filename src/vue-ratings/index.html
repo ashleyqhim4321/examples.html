@@ -4,12 +4,15 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Reviews Widget</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script src="https://unpkg.com/vue@3"></script>
 
     <style>
+      .text-orange-400 {
+        color: rgba(244 126 39, 1);
+      }
       /* we will explain what these classes do next! */
       .fade-move,
       .fade-enter-active,
@@ -25,62 +28,112 @@
       .fade-leave-active {
         position: absolute;
       }
+
+      .previousButton,
+      .nextButton {
+        position: absolute;
+        top: 5%;
+      }
+      .previousButton {
+        left: 2%;
+      }
+      .nextButton {
+        right: 2%;
+        -webkit-transform: rotateY(180deg);
+        -moz-transform: rotateY(180deg);
+        -o-transform: rotateY(180deg);
+        transform: rotateY(180deg);
+      }
+      .grid-container {
+        display: grid;
+        justify-content: center;
+        grid-template-columns: 25% 25% 25%;
+        padding: 20px;
+      }
+      .h-13 {
+        height: 3.5rem;
+      }
     </style>
   </head>
 
   <body>
     <div id="app">
-      <button
+      <!-- <button
         class="m-1 p-2 text-white bg-red-600 rounded focus:outline-none"
         @click="fetchData"
       >
         Fetch data
       </button>
-      <br />
+      <br /> -->
 
       <div v-if="dataHasLoaded">
         <!-- nav buttons -->
         <div class="block">
           <button
             type="button"
-            class="m-1 p-2 text-white bg-blue-600 rounded focus:outline-none"
+            class="previousButton rounded focus:outline-none"
             :class="previousButtonDisabled ? 'disabled:opacity-25':''"
             :disabled="previousButtonDisabled"
             @click="--pageNumber"
           >
-            Previous
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-9 h-13 text-black-400"
+              fill="currentColor"
+              viewBox="10 20 50 30"
+            >
+              <path
+                d="M12.745,23.915c0.283-0.282,0.59-0.52,0.913-0.727L35.266,1.581c2.108-2.107,5.528-2.108,7.637,0.001
+           c2.109,2.108,2.109,5.527,0,7.637L24.294,27.828l18.705,18.706c2.109,2.108,2.109,5.526,0,7.637
+           c-1.055,1.056-2.438,1.582-3.818,1.582s-2.764-0.526-3.818-1.582L13.658,32.464c-0.323-0.207-0.632-0.445-0.913-0.727
+           c-1.078-1.078-1.598-2.498-1.572-3.911C11.147,26.413,11.667,24.994,12.745,23.915z"
+              ></path>
+            </svg>
           </button>
 
           <button
             type="button"
-            class="m-1 p-2 text-white bg-blue-600 rounded focus:outline-none"
+            class="nextButton rounded focus:outline-none"
             :class="nextButtonDisabled ? 'disabled:opacity-25':''"
             :disabled="nextButtonDisabled"
             @click="++pageNumber"
           >
-            Next
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-9 h-13 text-black-400"
+              fill="currentColor"
+              viewBox="10 20 50 30"
+            >
+              <path
+                d="M12.745,23.915c0.283-0.282,0.59-0.52,0.913-0.727L35.266,1.581c2.108-2.107,5.528-2.108,7.637,0.001
+       c2.109,2.108,2.109,5.527,0,7.637L24.294,27.828l18.705,18.706c2.109,2.108,2.109,5.526,0,7.637
+       c-1.055,1.056-2.438,1.582-3.818,1.582s-2.764-0.526-3.818-1.582L13.658,32.464c-0.323-0.207-0.632-0.445-0.913-0.727
+       c-1.078-1.078-1.598-2.498-1.572-3.911C11.147,26.413,11.667,24.994,12.745,23.915z"
+              ></path>
+            </svg>
           </button>
         </div>
         <!-- reviews -->
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid-container gap-4">
           <div
             class="m-2 block"
             v-for="(review, reviewCurrentIndex) in currentPage"
             :key="review.store_review_id"
+            :idkey="(reviewCurrentIndex)"
           >
             <div class="m-2">
               <div class="flex items-center">
                 <p
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400 mr-2"
+                  class="text-sm font-medium text-gray-900 dark:text-gray-900 mr-2"
                 >
-                  {{review.reviewer.first_name}} {{review.reviewer.last_name}}
+                  {{review.reviewer.first_name }} {{ review.reviewer.last_name}}
                 </p>
                 <svg
-                  class="w-5 h-5 text-yellow-400"
+                  class="w-5 h-5 text-orange-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   v-for="(rating, ratingCurrentIndex) in 5"
-                  :class="(ratingCurrentIndex + 1) <= review.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500'"
+                  :class="(ratingCurrentIndex + 1) <= review.rating ? 'text-orange-400' : 'text-gray-300 dark:text-gray-500'"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
@@ -89,7 +142,10 @@
                 </svg>
               </div>
               <div>
-                <span>{{ review.comments }}</span>
+                <span
+                  class="text-sm text-gray-600 dark:text-gray-600"
+                  v-html="review.comments"
+                ></span>
               </div>
               <div><span class="text-xs">Posted {{review.date}}</span></div>
             </div>
@@ -106,26 +162,27 @@
           return {
             reviewData: null,
             pageNumber: 1, //
-            pageSize: 3, // pageSize means number of reviews per page
+            pageSize: 3, // pageSize means number of reviews per page12
           };
         },
-        methods: {
-          async fetchData() {
+        computed: {
+          dataHasLoaded() {
             fetch(
-              //"https://api.reviews.io/merchant/latest?store=sable-intl&tag=general"
-              "data.json"
+              "https://api.reviews.io/merchant/latest?store=sable-intl&tag=general"
+              //"data.json"
             )
               .then((response) => response.json())
               .then((data) => {
                 this.reviewData = data;
               });
-          },
-        },
-        computed: {
-          dataHasLoaded() {
+
             // check that reviewData is not undefined/null
             // if so it means data has loaded
+
             return this.reviewData;
+          },
+          decodeHtml(html) {
+            return $("<div>").html(html).text();
           },
           currentPage() {
             if (this.dataHasLoaded) {
